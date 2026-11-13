@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block titulo %}Novo produto{% endblock %}
+
+{% block conteudo %}
+<section class="secao colada">
+  <div class="container">
+    <a class="voltar revelar" href="/admin"><i data-lucide="arrow-left"></i> Voltar ao painel</a>
+    <div class="cabecalho-secao revelar">
+      <div>
+        <span class="rotulo">MongoDB · documento flexível</span>
+        <h1 class="titulo">Cadastrar produto</h1>
+      </div>
+    </div>
+
+    <form class="formulario-produto" method="post" enctype="multipart/form-data" x-data="formProduto">
+      <div>
+        <div class="bloco revelar">
+          <h2>Informações obrigatórias</h2>
+          <p>Todo produto precisa de nome, descrição, preço e foto.</p>
+          <div class="campo">
+            <label for="nome">Nome</label>
+            <input id="nome" name="nome" x-model="nome" required placeholder="Ex.: Controle Sem Fio Pro">
+          </div>
+          <div class="dois">
+            <div class="campo">
+              <label for="preco">Preço (R$)</label>
+              <input id="preco" name="preco" x-model="preco" required inputmode="decimal" placeholder="199,90">
+            </div>
+            <div class="campo">
+              <label>Loja</label>
+              <input value="Respawn Store" disabled>
+            </div>
+          </div>
+          <div class="campo">
+            <label for="descricao">Descrição</label>
+            <textarea id="descricao" name="descricao" required placeholder="Conte o que o produto tem de melhor"></textarea>
+          </div>
+          <div class="campo">
+            <label>Foto</label>
+            <label class="soltar" :class="{ arrastando }" @dragover="arrastando = true" @dragleave="arrastando = false">
+              <input type="file" name="imagem" accept="image/png,image/jpeg,image/webp" required @change="escolherFoto">
+              <template x-if="foto"><img :src="foto" alt="Prévia da foto"></template>
+              <i data-lucide="image-up"></i>
+              <strong>Arraste a foto aqui ou clique para escolher</strong>
+              <span style="font-size:.85rem">PNG, JPG ou WEBP, até 5 MB</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="bloco revelar">
+          <h2>Campos do produto</h2>
+          <p>Crie os campos que fazem sentido para este produto. Cada um vira um campo no documento do MongoDB.</p>
+          <div class="atalhos">
+            <template x-for="s in sugestoes" :key="s">
+              <button type="button" @click="adicionar(s)" x-text="'+ ' + s"></button>
+            </template>
+          </div>
+          <template x-for="(c, i) in campos" :key="c.id">
+            <div class="linha-campo">
+              <input name="campo" x-model="c.campo" placeholder="Nome do campo (ex.: cor)">
+              <input name="valor" x-model="c.valor" placeholder="Valor (ex.: preto)">
+              <button type="button" @click="remover(i)" aria-label="Remover campo"><i data-lucide="x"></i></button>
+            </div>
+          </template>
+          <button type="button" class="botao vazado" @click="adicionar()"><i data-lucide="plus"></i> Campo em branco</button>
+        </div>
+
+        <button class="botao grande" data-magnetico><i data-lucide="check"></i> Cadastrar produto</button>
+      </div>
+
+      <aside class="previa revelar">
+        <span class="rotulo">Prévia no catálogo</span>
+        <article class="cartao">
+          <div class="cartao-foto">
+            <template x-if="foto"><img :src="foto" alt=""></template>
+            <span class="cartao-loja">Respawn Store</span>
+          </div>
+          <div class="cartao-corpo">
+            <h3 class="cartao-nome" x-text="nome || 'Nome do produto'"></h3>
+            <div class="etiquetas">
+              <template x-for="c in camposPreenchidos.slice(0, 3)" :key="c.id">
+                <span class="etiqueta" x-text="c.campo + ': ' + c.valor"></span>
+              </template>
+            </div>
+            <div class="cartao-rodape">
+              <span class="preco" x-text="precoNaPrevia"></span>
+              <span class="botao" style="pointer-events:none"><i data-lucide="plus"></i> Carrinho</span>
+            </div>
+          </div>
+        </article>
+      </aside>
+    </form>
+  </div>
+</section>
+{% endblock %}

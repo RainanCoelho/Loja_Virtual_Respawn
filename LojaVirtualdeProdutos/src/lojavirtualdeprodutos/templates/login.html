@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titulo %}Entrar{% endblock %}
+
+{% block conteudo %}
+<section class="caixa-login">
+  <div class="cartao-login revelar">
+    <span class="rotulo">Área restrita</span>
+    <h1 class="titulo" style="font-size:2rem;margin:8px 0 6px">Painel do administrador</h1>
+    <p class="suave" style="margin:0 0 26px">Entre para cadastrar e gerenciar os produtos.</p>
+
+    <form method="post" x-data="{ ver: false }">
+      <div class="campo">
+        <label for="email">E-mail</label>
+        <input id="email" name="email" type="email" required autocomplete="username" autofocus>
+      </div>
+      <div class="campo">
+        <label for="senha">Senha</label>
+        <div class="entrada">
+          <input id="senha" name="senha" :type="ver ? 'text' : 'password'" type="password" required autocomplete="current-password">
+          <button type="button" class="olho" @click="ver = !ver" :aria-label="ver ? 'Esconder senha' : 'Mostrar senha'">
+            <i data-lucide="eye" x-show="!ver"></i><i data-lucide="eye-off" x-show="ver" x-cloak></i>
+          </button>
+        </div>
+      </div>
+      <button class="botao grande cheio" data-magnetico>Entrar <i data-lucide="arrow-right"></i></button>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,39 @@
+{# Card de produto, usado no catálogo, nas vitrines e na busca. Recebe "p" e, opcionalmente, "selo" ("novo"). #}
+{% set d = p|desconto %}
+<article class="cartao revelar" data-preco="{{ p.preco }}" data-nome="{{ p.nome }}">
+  <a class="cartao-link" href="/produto/{{ p._id }}" aria-label="Ver {{ p.nome }}"></a>
+  <div class="cartao-foto">
+    <img src="{{ p.imagem }}" alt="{{ p.nome }}" loading="lazy">
+    <span class="cartao-loja">{{ p.loja }}</span>
+    {% if p.vendidos %}
+      <span class="cartao-ranking">#{{ p.posicao }} · {{ p.vendidos }} vendido{{ "s" if p.vendidos != 1 }}</span>
+    {% elif selo == "novo" %}
+      <span class="cartao-novo">Novo</span>
+    {% elif d %}
+      <span class="cartao-desconto">-{{ d }}%</span>
+    {% endif %}
+  </div>
+  <div class="cartao-corpo">
+    <h3 class="cartao-nome">{{ p.nome }}</h3>
+    {% set visiveis = p.atributos|visiveis %}
+    {% if visiveis %}
+      <div class="etiquetas">
+        {% for campo, valor in visiveis.items() %}{% if loop.index <= 3 %}
+          <span class="etiqueta">{{ campo }}: {{ valor }}</span>
+        {% endif %}{% endfor %}
+      </div>
+    {% endif %}
+    <div class="cartao-rodape">
+      <div class="precos">
+        {% if d %}<span class="preco-antigo">{{ (p|preco_antigo)|reais }}</span>{% endif %}
+        <span class="preco">{{ p.preco|reais }}</span>
+      </div>
+      <form method="post" action="/carrinho/adicionar/{{ p._id }}">
+        <button class="botao botao-add"
+                hx-post="/carrinho/adicionar/{{ p._id }}" hx-swap="none" aria-label="Adicionar {{ p.nome }} ao carrinho">
+          <i data-lucide="plus"></i> Carrinho
+        </button>
+      </form>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,694 @@
+/* =========================================================================================
+   RESPAWN · visual do site
+   Cores e medidas ficam nas variáveis abaixo: mude aqui para mudar o site inteiro.
+   ========================================================================================= */
+:root {
+  /* Azul + preto, com painéis de vidro (fundo translúcido, borda fina clara e desfoque atrás) */
+  --fundo: #05070c;
+  --fundo-2: #0a0f1a;
+  --cartao: rgba(47, 110, 220, 0.07);
+  --cartao-2: rgba(70, 140, 255, 0.11);
+  --vidro: rgba(14, 20, 34, 0.55);
+  --desfoque: blur(18px) saturate(1.3);
+  --linha: rgba(130, 175, 255, 0.14);
+  --linha-forte: rgba(150, 190, 255, 0.28);
+  --texto: #f2f5fb;
+  --suave: #9aa6bd;
+  --neon: #2f8cff;
+  --roxo: #6366f1;
+  --ciano: #1fd3f2;
+  --erro: #ff4d6d;
+  --whats: #25d366;
+  --raio: 24px;
+  --raio-p: 14px;
+  --sombra: 0 24px 70px rgba(0, 0, 0, 0.5);
+  --fonte-titulo: "Outfit", system-ui, sans-serif;
+  --fonte: "Inter", system-ui, sans-serif;
+  --topo: 76px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--fundo); color-scheme: dark; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* fundo da página: preto com várias luzes azuis espalhadas */
+  background:
+    radial-gradient(1100px 650px at 90% 0%, rgba(47, 140, 255, 0.24), transparent 60%),
+    radial-gradient(900px 700px at 0% 40%, rgba(47, 140, 255, 0.14), transparent 60%),
+    radial-gradient(800px 600px at 100% 70%, rgba(31, 211, 242, 0.08), transparent 60%),
+    radial-gradient(1000px 700px at 40% 100%, rgba(70, 90, 255, 0.14), transparent 60%),
+    linear-gradient(180deg, #05070c, #060b17 60%, #05070c);
+  background-attachment: fixed;
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+button, input, textarea, select { font: inherit; color: inherit; }
+[x-cloak] { display: none !important; }
+::selection { background: var(--neon); color: #ffffff; }
+
+.container { width: min(1200px, 100% - 32px); margin-inline: auto; }
+.titulo { font-family: var(--fonte-titulo); font-weight: 600; letter-spacing: -0.01em; line-height: 1.08; margin: 0; }
+.rotulo {
+  font-family: var(--fonte); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--ciano);
+}
+/* todos os painéis do site são de vidro: fundo translúcido + desfoque do que está atrás */
+.cartao, .vantagem, .item, .resumo, .numero, .bloco, .linha-admin, .ficha div, .cartao-login, .vazio-grande,
+.abas, .busca form, .icone-botao {
+  backdrop-filter: var(--desfoque); -webkit-backdrop-filter: var(--desfoque);
+}
+.modal, .busca-pop, .aviso { background: rgba(12, 18, 32, 0.78) !important; backdrop-filter: var(--desfoque); -webkit-backdrop-filter: var(--desfoque); }
+.vazio-grande { background: var(--cartao); border-style: solid; border-color: var(--linha); }
+.rodape { background: rgba(255, 255, 255, 0.02); backdrop-filter: var(--desfoque); }
+
+/* painel de vidro reutilizável */
+.vidro { background: var(--vidro); backdrop-filter: var(--desfoque); -webkit-backdrop-filter: var(--desfoque); border: 1px solid var(--linha); }
+.suave { color: var(--suave); }
+.gradiente {
+  background: linear-gradient(90deg, var(--neon), var(--ciano) 45%, var(--roxo));
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.icone { width: 1.15em; height: 1.15em; stroke-width: 2; flex: none; }
+
+/* ----------------------------------------------------------------- botões */
+.botao {
+  --cor: var(--neon);
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 0.55em;
+  padding: 0.8em 1.6em; border-radius: 999px; border: 1px solid transparent; cursor: pointer;
+  font-family: var(--fonte); font-weight: 500; letter-spacing: 0.01em; white-space: nowrap;
+  background: var(--cor); color: #ffffff; overflow: hidden; isolation: isolate;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  will-change: transform;
+}
+.botao::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background: linear-gradient(120deg, transparent 20%, rgba(255, 255, 255, 0.55) 50%, transparent 80%);
+  transform: translateX(-120%); transition: transform 0.6s ease;
+}
+/* hover discreto: o botão só clareia um pouco e ganha uma sombra leve (sem brilho forte nem movimento) */
+.botao::after { display: none; }
+.botao:hover { filter: brightness(1.08); box-shadow: 0 6px 18px color-mix(in srgb, var(--cor) 25%, transparent); }
+.botao:active { transform: scale(0.98); }
+.botao.vazado { background: transparent; color: var(--texto); border-color: rgba(255, 255, 255, 0.7); }
+.botao.vazado:hover { border-color: #fff; background: rgba(255, 255, 255, 0.08); color: #fff; box-shadow: none; }
+.botao.whats { --cor: var(--whats); }
+.botao.perigo { --cor: var(--erro); color: #fff; }
+.botao.grande { font-size: 1.05rem; padding: 1em 1.6em; }
+.botao.cheio { width: 100%; }
+.botao.redondo { width: 42px; height: 42px; padding: 0; border-radius: 50%; }
+.botao.htmx-request { pointer-events: none; opacity: 0.7; }
+
+/* ----------------------------------------------------------------- cursor personalizado */
+.cursor-anel, .cursor-ponto {
+  position: fixed; left: 0; top: 0; pointer-events: none; z-index: 9999; border-radius: 50%;
+  translate: -50% -50%; opacity: 0; transition: opacity 0.3s ease;
+}
+.cursor-anel {
+  width: 38px; height: 38px; border: 1.5px solid var(--neon);
+  transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+}
+.cursor-ponto { width: 6px; height: 6px; background: var(--neon); }
+body.com-cursor .cursor-anel, body.com-cursor .cursor-ponto { opacity: 1; }
+body.cursor-sobre .cursor-anel { width: 64px; height: 64px; background: rgba(47, 140, 255, 0.08); border-color: rgba(47, 140, 255, 0.6); }
+@media (pointer: coarse) { .cursor-anel, .cursor-ponto { display: none; } }
+
+/* ----------------------------------------------------------------- cabeçalho */
+.topo {
+  position: fixed; inset: 0 0 auto; z-index: 50; height: var(--topo);
+  display: flex; align-items: center;
+  transition: background 0.35s ease, border-color 0.35s ease, height 0.35s ease;
+  border-bottom: 1px solid transparent;
+}
+.topo.rolou { background: rgba(5, 7, 12, 0.6); backdrop-filter: var(--desfoque); border-color: var(--linha); height: 64px; }
+.topo .container { display: flex; align-items: center; gap: 28px; }
+.marca { display: flex; align-items: center; gap: 12px; font-family: var(--fonte-titulo); font-weight: 600; font-size: 1.3rem; letter-spacing: 0.08em; }
+/* logotipo: círculo azul cheio, como na referência */
+.marca-icone {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--neon); color: #ffffff;
+  box-shadow: 0 0 22px rgba(47, 140, 255, 0.5);
+}
+.menu { display: flex; gap: 28px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.85); }
+.menu a { position: relative; transition: color 0.25s; }
+.menu a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -6px; height: 1.5px; background: var(--neon); transform: scaleX(0); transition: transform 0.3s ease; }
+.menu a:hover { color: #fff; }
+.menu a:hover::after { transform: scaleX(1); }
+@media (max-width: 1000px) { .menu { display: none; } }
+.marca:hover .marca-icone { animation: girar 0.8s ease; }
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.busca { position: relative; flex: 1; max-width: 360px; margin-left: auto; }
+.busca form { display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 16px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--linha); transition: border-color 0.25s, box-shadow 0.25s, background 0.25s; }
+.busca form:focus-within { border-color: var(--neon); background: rgba(255, 255, 255, 0.07); box-shadow: 0 0 0 4px rgba(47, 140, 255, 0.12); }
+.busca input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; }
+.busca input::placeholder { color: var(--suave); }
+.busca-pop {
+  position: absolute; top: calc(100% + 10px); left: 0; right: 0; padding: 14px;
+  background: rgba(17, 21, 30, 0.96); backdrop-filter: blur(14px); border: 1px solid var(--linha);
+  border-radius: var(--raio); box-shadow: var(--sombra); transform-origin: top center;
+}
+.busca-pop header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 0.82rem; color: var(--suave); }
+.busca-pop header button { background: none; border: 0; color: var(--suave); cursor: pointer; font-size: 0.8rem; }
+.busca-pop header button:hover { color: var(--erro); }
+.lista-buscas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.lista-buscas a { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.06); font-size: 0.88rem; transition: background 0.2s, color 0.2s; }
+.lista-buscas a:hover { background: rgba(47, 140, 255, 0.14); color: var(--neon); }
+.lista-buscas .vazio { color: var(--suave); font-size: 0.88rem; }
+
+.acoes-topo { display: flex; align-items: center; gap: 10px; }
+.icone-botao {
+  position: relative; width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05); border: 1px solid var(--linha); transition: border-color 0.25s, color 0.25s, transform 0.25s;
+}
+.icone-botao:hover { border-color: var(--neon); color: var(--neon); }
+.contador {
+  position: absolute; top: -4px; right: -4px; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px;
+  display: grid; place-items: center; background: var(--neon); color: #ffffff; font-size: 0.72rem; font-weight: 700;
+  box-shadow: 0 0 14px rgba(47, 140, 255, 0.7);
+}
+.contador[data-qtd="0"] { display: none; }
+.pulo { animation: pulo 0.6s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes pulo { 30% { transform: scale(1.45); } 100% { transform: scale(1); } }
+
+/* ----------------------------------------------------------------- avisos (toasts) */
+.avisos { position: fixed; right: 20px; bottom: 20px; z-index: 200; display: grid; gap: 10px; }
+.aviso {
+  display: flex; align-items: center; gap: 12px; min-width: 260px; max-width: 360px; padding: 14px 16px;
+  border-radius: var(--raio-p); background: rgba(17, 21, 30, 0.95); backdrop-filter: blur(12px);
+  border: 1px solid var(--linha); border-left: 3px solid var(--neon); box-shadow: var(--sombra);
+}
+.aviso .icone { color: var(--neon); }
+
+/* ----------------------------------------------------------------- vitrine 3D (página inicial) */
+/* A vitrine fica fixa na tela enquanto a página rola. Tudo acontece dentro de uma "moldura" de
+   vidro com cantos bem arredondados; atrás dos objetos passa uma faixa diagonal colorida. */
+.vitrine { position: relative; height: 460vh; }
+.palco { position: sticky; top: 0; height: 100vh; overflow: hidden; padding: calc(var(--topo) + 4px) 22px 22px; }
+.moldura {
+  --tom: rgba(47, 140, 255, 0.35);       /* brilho atrás do objeto (muda com o objeto) */
+  --faixa: #1fd3f2;                       /* cor da faixa diagonal (muda com o objeto) */
+  position: relative; height: 100%; border-radius: 40px; overflow: hidden; isolation: isolate;
+  border: 1px solid rgba(130, 175, 255, 0.22);
+  background:
+    radial-gradient(55% 75% at 68% 55%, var(--tom), transparent 70%),
+    radial-gradient(45% 60% at 0% 0%, rgba(47, 140, 255, 0.22), transparent 70%),
+    radial-gradient(40% 50% at 15% 100%, rgba(70, 100, 255, 0.18), transparent 70%),
+    linear-gradient(160deg, rgba(16, 32, 66, 0.6), rgba(6, 10, 20, 0.5));
+  box-shadow: inset 0 1px 0 rgba(150, 190, 255, 0.12), 0 30px 80px rgba(0, 10, 40, 0.55);
+}
+.faixa-diagonal {
+  position: absolute; top: -40%; bottom: -40%; right: 16%; width: 26%; z-index: -1;
+  background: linear-gradient(180deg, var(--faixa), color-mix(in srgb, var(--faixa) 70%, #000));
+  transform: rotate(32deg); transform-origin: center;
+  box-shadow: 0 0 120px color-mix(in srgb, var(--faixa) 45%, transparent);
+}
+.moldura canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.palavra-fundo {
+  position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: -1;
+  font-family: var(--fonte-titulo); font-weight: 700; font-size: clamp(5rem, 18vw, 16rem); letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.025); filter: blur(2px); white-space: nowrap; will-change: transform;
+}
+/* textos sempre à esquerda, numa coluna que o carrossel não cobre */
+/* Centralizada com flex (e não com translate: -50%), porque a animação do GSAP sobrescreve o
+   "translate" do elemento e o texto descia até as redes sociais. Fica entre o topo e o rodapé da moldura. */
+.legenda {
+  position: absolute; left: clamp(24px, 6%, 90px); top: 0; bottom: 76px; padding-top: 24px;
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+  width: min(440px, 40%); opacity: 0; z-index: 2; pointer-events: none;
+}
+.legenda a { pointer-events: auto; }
+.legenda .titulo { font-size: clamp(2.2rem, 4.6vw, 4rem); margin: 12px 0 10px; }
+.legenda .subtitulo { font-family: var(--fonte-titulo); font-size: clamp(1.1rem, 2vw, 1.6rem); font-weight: 400; color: #fff; margin: 0 0 16px; }
+.legenda p { color: rgba(255, 255, 255, 0.78); font-size: 1rem; margin: 0 0 28px; max-width: 34ch; }
+.legenda .acoes-legenda { display: flex; flex-wrap: wrap; gap: 14px; }
+.legenda.inicial { opacity: 1; }
+.indicador-rolar {
+  position: absolute; left: 50%; bottom: 26px; translate: -50% 0; z-index: 2;
+  display: grid; justify-items: center; gap: 8px; font-size: 0.7rem; letter-spacing: 0.2em; color: var(--suave);
+}
+.indicador-rolar span { width: 22px; height: 36px; border: 1.5px solid var(--linha-forte); border-radius: 12px; position: relative; }
+.indicador-rolar span::after {
+  content: ""; position: absolute; left: 50%; top: 7px; width: 4px; height: 8px; margin-left: -2px; border-radius: 2px;
+  background: var(--neon); animation: rolar 1.6s ease-in-out infinite;
+}
+@keyframes rolar { 0% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(12px); opacity: 0; } 100% { opacity: 0; } }
+/* pontinhos à direita: brancos; o atual vira um anel azul */
+.progresso-vitrine { position: absolute; right: 34px; top: 50%; translate: 0 -50%; display: grid; justify-items: center; gap: 14px; z-index: 2; }
+.progresso-vitrine i { display: block; width: 8px; height: 8px; border-radius: 50%; background: #fff; transition: all 0.35s ease; }
+.progresso-vitrine i.ativo { width: 14px; height: 14px; background: transparent; border: 1.5px solid var(--neon); box-shadow: 0 0 10px rgba(47, 140, 255, 0.6); }
+/* cantos de baixo: redes sociais (esquerda) e nome do objeto atual (direita) */
+.moldura-rodape { position: absolute; left: clamp(24px, 6%, 90px); right: 34px; bottom: 24px; display: flex; justify-content: space-between; align-items: center; z-index: 2; pointer-events: none; }
+.redes { display: flex; gap: 10px; pointer-events: auto; }
+.redes a { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, 0.92); color: #05070c; transition: transform 0.25s, background 0.25s; }
+.redes a:hover { transform: translateY(-2px); background: #fff; }
+.redes .icone { width: 17px; height: 17px; }
+.nome-objeto { font-family: var(--fonte-titulo); font-size: 1rem; color: #fff; letter-spacing: 0.02em; }
+.sem-3d .moldura canvas { display: none; }
+
+/* ----------------------------------------------------------------- tela de carregamento */
+html.travado, html.travado body { overflow: hidden; }
+.carregando {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 50%, #0a1426, var(--fundo) 70%);
+  clip-path: inset(0 0 0 0);
+}
+.carregando-centro { width: min(420px, 100% - 48px); }
+.carregando-palavra {
+  position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  font-family: var(--fonte-titulo); font-weight: 700; font-size: clamp(4rem, 17vw, 14rem); letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.035);
+}
+.carregando-linha { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; font-family: var(--fonte-titulo); letter-spacing: 0.22em; font-size: 0.8rem; color: var(--suave); }
+.carregando-linha strong { font-size: 1.6rem; color: var(--texto); letter-spacing: 0.02em; }
+.carregando-trilho { height: 2px; background: var(--linha); overflow: hidden; }
+.carregando-trilho span { display: block; height: 100%; background: linear-gradient(90deg, var(--neon), var(--ciano)); transform: scaleX(0); transform-origin: left; box-shadow: 0 0 12px var(--neon); }
+.carregando-dica { margin-top: 14px; font-size: 0.8rem; color: var(--suave); }
+.carregando-dica span { animation: piscar 1s steps(2) infinite; }
+@keyframes piscar { 50% { opacity: 0; } }
+
+/* ----------------------------------------------------------------- títulos letra por letra */
+.palavra { display: inline-block; white-space: nowrap; }
+.letra { display: inline-block; will-change: transform, filter; }
+
+/* ----------------------------------------------------------------- vantagens */
+.vantagens { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 18px; }
+.vantagem {
+  position: relative; padding: 26px 24px; border-radius: var(--raio); background: var(--cartao); border: 1px solid var(--linha);
+  overflow: hidden; transition: border-color 0.3s, transform 0.3s;
+}
+.vantagem::before {
+  content: ""; position: absolute; inset: auto -40% -60% auto; width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, var(--cor, var(--neon)), transparent 70%); opacity: 0.12; transition: opacity 0.4s, transform 0.4s;
+}
+.vantagem:hover { border-color: color-mix(in srgb, var(--cor, var(--neon)) 50%, transparent); transform: translateY(-6px); }
+.vantagem:hover::before { opacity: 0.3; transform: scale(1.2); }
+.vantagem-numero { font-family: var(--fonte-titulo); font-size: 0.8rem; letter-spacing: 0.2em; color: var(--suave); }
+.vantagem .icone { width: 30px; height: 30px; margin: 18px 0 14px; color: var(--cor, var(--neon)); }
+.vantagem h3 { font-family: var(--fonte-titulo); font-size: 1.25rem; margin: 0 0 8px; }
+.vantagem p { margin: 0; color: var(--suave); font-size: 0.95rem; }
+
+/* ----------------------------------------------------------------- clique no card (abre o produto) */
+/* ao clicar: o card só acende a luz embaixo antes de abrir o produto (sem girar nem encolher) */
+.cartao.abrindo { box-shadow: 0 18px 40px -12px rgba(47, 140, 255, 0.55), 0 0 0 1px rgba(47, 140, 255, 0.5); }
+
+/* transição suave entre páginas (a foto do card vira a foto grande do produto) */
+@view-transition { navigation: auto; }
+::view-transition-group(foto-produto), ::view-transition-group(nome-produto) { animation-duration: 0.65s; animation-timing-function: cubic-bezier(.7, 0, .2, 1); }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.35s; }
+.produto-foto img { view-transition-name: foto-produto; }
+.produto-info h1 { view-transition-name: nome-produto; }
+
+/* ----------------------------------------------------------------- faixa que corre */
+.faixa {
+  overflow: hidden; width: min(1240px, 100% - 44px); margin: 24px auto 0; padding: 16px 0; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.035); backdrop-filter: var(--desfoque);
+}
+.faixa-trilho { display: flex; gap: 48px; width: max-content; animation: correr 28s linear infinite; }
+.faixa-trilho span { display: inline-flex; align-items: center; gap: 48px; font-family: var(--fonte-titulo); font-size: 1.4rem; letter-spacing: 0.18em; color: var(--suave); white-space: nowrap; }
+.faixa-trilho span::after { content: "✦"; color: var(--neon); }
+@keyframes correr { to { transform: translateX(-50%); } }
+
+/* ----------------------------------------------------------------- catálogo */
+.secao { padding: 48px 0; }
+.secao.colada { padding-top: calc(var(--topo) + 24px); }
+
+/* Cada seção fica numa moldura de vidro como a da primeira tela (cantos de 40 px, borda fina),
+   mas sem a faixa diagonal: o azul aparece como luz espalhada pelo painel. */
+.secao > .container {
+  position: relative; isolation: isolate; overflow: clip;
+  width: min(1240px, 100% - 44px);
+  padding: clamp(24px, 4vw, 56px);
+  border-radius: 40px;
+  border: 1px solid rgba(120, 170, 255, 0.18);
+  background:
+    radial-gradient(55% 45% at 90% 0%, rgba(47, 140, 255, 0.28), transparent 70%),
+    radial-gradient(45% 55% at 0% 100%, rgba(47, 140, 255, 0.18), transparent 70%),
+    radial-gradient(40% 40% at 50% 55%, rgba(31, 211, 242, 0.06), transparent 70%),
+    linear-gradient(160deg, rgba(20, 40, 80, 0.45), rgba(8, 14, 28, 0.35));
+  box-shadow: inset 0 1px 0 rgba(150, 190, 255, 0.12), 0 30px 80px rgba(0, 10, 40, 0.5);
+}
+/* uma seção sim, outra não, a luz troca de lado para o ambiente não ficar repetitivo */
+.secao:nth-of-type(even) > .container {
+  background:
+    radial-gradient(55% 45% at 10% 0%, rgba(47, 140, 255, 0.28), transparent 70%),
+    radial-gradient(45% 55% at 100% 100%, rgba(99, 102, 241, 0.18), transparent 70%),
+    linear-gradient(200deg, rgba(20, 40, 80, 0.45), rgba(8, 14, 28, 0.35));
+}
+@media (max-width: 700px) {
+  .secao > .container { width: calc(100% - 20px); border-radius: 28px; }
+}
+.cabecalho-secao { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 36px; }
+.cabecalho-secao .titulo { font-size: clamp(2rem, 4vw, 3rem); margin-top: 8px; }
+.ordenar { display: flex; align-items: center; gap: 10px; color: var(--suave); font-size: 0.9rem; }
+.ordenar select {
+  appearance: none; padding: 10px 38px 10px 16px; border-radius: 999px; cursor: pointer;
+  background: rgba(255, 255, 255, 0.05) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%238d96aa' stroke-width='2'%3E%3Cpath d='m2 4 4 4 4-4'/%3E%3C/svg%3E") no-repeat right 14px center;
+  border: 1px solid var(--linha);
+}
+.ordenar select:focus { outline: none; border-color: var(--neon); }
+
+/* abas do catálogo (Todos / Mais vendidos) */
+.abas { display: inline-flex; gap: 6px; padding: 5px; margin-bottom: 26px; border-radius: 999px; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--linha); }
+.abas button {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border: 0; border-radius: 999px; cursor: pointer;
+  background: none; color: var(--suave); font-family: var(--fonte-titulo); font-weight: 600; letter-spacing: 0.03em;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.abas button span { font-size: 0.75rem; padding: 1px 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); }
+.abas button:hover { color: var(--texto); }
+.abas button.ativa { background: var(--neon); color: #ffffff; }
+.abas button.ativa span { background: rgba(255, 255, 255, 0.2); }
+.cartao-ranking {
+  position: absolute; right: 10px; top: 10px; padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
+  background: rgba(14, 10, 4, 0.82); color: #ffb35c; border: 1px solid rgba(255, 179, 92, 0.35); backdrop-filter: blur(6px);
+}
+
+.grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 22px; }
+/* Card calmo: ao passar o mouse ele sobe um pouco, clareia, a borda ganha cor e acende uma
+   luz suave embaixo. Nada de girar ou seguir o ponteiro. */
+.cartao {
+  position: relative; display: flex; flex-direction: column; border-radius: var(--raio);
+  background: linear-gradient(180deg, var(--cartao-2), var(--cartao)); border: 1px solid var(--linha);
+  transition: translate 0.4s ease, background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+}
+/* "translate" (e não "transform"), porque a animação de entrada já usa o transform do card */
+.cartao:hover {
+  translate: 0 -6px;
+  background: linear-gradient(180deg, rgba(47, 140, 255, 0.12), rgba(255, 255, 255, 0.05));
+  border-color: rgba(47, 140, 255, 0.35);
+  box-shadow: 0 22px 40px -18px rgba(47, 140, 255, 0.35), 0 18px 40px rgba(0, 0, 0, 0.35);
+}
+.cartao-foto {
+  position: relative; aspect-ratio: 1; margin: 10px 10px 0; border-radius: calc(var(--raio) - 6px); overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #1d2433, #0b0e14);
+}
+.cartao-foto img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.4s ease; }
+.cartao:hover .cartao-foto img { filter: brightness(1.1); }
+.cartao-loja {
+  position: absolute; left: 10px; top: 10px; padding: 4px 10px; border-radius: 999px; font-size: 0.72rem;
+  background: rgba(7, 8, 12, 0.7); backdrop-filter: blur(6px); border: 1px solid var(--linha);
+}
+.cartao-corpo { display: flex; flex-direction: column; gap: 10px; flex: 1; padding: 16px 18px 18px; }
+.cartao-nome { font-family: var(--fonte-titulo); font-size: 1.15rem; font-weight: 600; line-height: 1.25; }
+.etiquetas { display: flex; flex-wrap: wrap; gap: 6px; }
+.etiqueta { padding: 3px 9px; border-radius: 999px; font-size: 0.74rem; color: var(--suave); background: rgba(255, 255, 255, 0.05); border: 1px solid var(--linha); }
+.cartao-rodape { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; }
+.preco { font-family: var(--fonte-titulo); font-size: 1.35rem; font-weight: 700; white-space: nowrap; }
+.cartao-rodape { flex-wrap: wrap; }
+.cartao .botao-add { padding: 0.7em 1.1em; }
+.cartao-link { position: absolute; inset: 0; z-index: 2; border-radius: inherit; }
+/* a foto e o texto "flutuam" em 3D na frente do link; deixam o clique passar, menos o botão */
+.cartao-foto, .cartao-corpo { pointer-events: none; }
+.cartao .botao-add { position: relative; z-index: 4; pointer-events: auto; }
+
+.vazio-grande { display: grid; justify-items: center; gap: 16px; text-align: center; padding: 80px 20px; border: 1px dashed var(--linha-forte); border-radius: var(--raio); }
+.vazio-grande .icone { width: 54px; height: 54px; color: var(--neon); }
+
+/* ----------------------------------------------------------------- página do produto */
+.produto { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; min-height: calc(100vh - var(--topo) - 120px); }
+.produto-foto {
+  position: relative; aspect-ratio: 1; border-radius: 32px; overflow: hidden;
+  background: radial-gradient(circle at 50% 35%, #142546, #070b14); border: 1px solid var(--linha);
+  box-shadow: 0 30px 70px rgba(0, 20, 60, 0.5);
+}
+.produto-foto img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+.produto-foto:hover img { transform: scale(1.05); }   /* aproximação leve, sem lupa */
+.voltar { display: flex; width: fit-content; align-items: center; gap: 8px; color: var(--suave); margin-bottom: 18px; transition: color 0.2s, gap 0.2s; }
+.voltar:hover { color: var(--neon); gap: 12px; }
+.produto-info .titulo { font-size: clamp(2.1rem, 4vw, 3.2rem); margin: 10px 0 16px; }
+.produto-info .preco { font-size: 2.2rem; display: block; margin-bottom: 20px; }
+.produto-info .descricao { color: var(--suave); font-size: 1.05rem; margin: 0 0 28px; white-space: pre-line; }
+.acoes-produto { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* destaques rápidos (3 primeiras características) logo abaixo da descrição */
+.destaques { list-style: none; padding: 0; margin: 0 0 30px; display: flex; flex-wrap: wrap; gap: 10px; }
+.destaques li {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px;
+  background: rgba(47, 140, 255, 0.1); border: 1px solid rgba(47, 140, 255, 0.28); font-size: 0.9rem; font-weight: 500;
+}
+.destaques .icone { width: 15px; height: 15px; color: var(--ciano); }
+
+/* como funciona a compra: três passos curtos */
+.como-comprar {
+  list-style: none; padding: 18px 0 0; margin: 28px 0 0; border-top: 1px solid var(--linha);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+}
+.como-comprar li { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--suave); line-height: 1.3; }
+.como-comprar .icone {
+  width: 36px; height: 36px; padding: 9px; border-radius: 12px; flex: none;
+  color: var(--neon); background: rgba(47, 140, 255, 0.1); border: 1px solid rgba(47, 140, 255, 0.22);
+}
+
+/* Ficha técnica: lista em duas colunas, cada linha com o nome à esquerda e o valor à direita.
+   Funciona igual para 1 ou 20 características (nada fica sobrando sozinho numa linha). */
+.ficha-tecnica { display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 40px; margin: 0; }
+.ficha-linha {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 24px;
+  padding: 18px 4px; border-bottom: 1px solid var(--linha);
+}
+.ficha-linha dt { color: var(--suave); font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase; }
+.ficha-linha dd { margin: 0; font-weight: 600; font-size: 1.05rem; text-align: right; }
+@media (max-width: 760px) {
+  .ficha-tecnica { grid-template-columns: 1fr; }
+  .como-comprar { grid-template-columns: 1fr; }
+}
+
+/* ----------------------------------------------------------------- carrinho */
+.carrinho { display: grid; grid-template-columns: 1fr 360px; gap: 32px; align-items: start; }
+.itens { display: grid; gap: 14px; }
+.item {
+  display: grid; grid-template-columns: 96px 1fr auto; gap: 18px; align-items: center; padding: 14px;
+  border-radius: var(--raio); background: var(--cartao); border: 1px solid var(--linha); transition: border-color 0.25s;
+}
+.item:hover { border-color: var(--linha-forte); }
+.item img { width: 96px; height: 96px; object-fit: cover; border-radius: var(--raio-p); }
+.item-nome { font-family: var(--fonte-titulo); font-weight: 600; font-size: 1.1rem; }
+.quantidade { display: inline-flex; align-items: center; gap: 4px; margin-top: 10px; padding: 4px; border-radius: 999px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--linha); }
+.quantidade button { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.quantidade button:hover { background: rgba(47, 140, 255, 0.15); color: var(--neon); }
+.quantidade span { min-width: 26px; text-align: center; font-weight: 600; }
+.item-direita { display: grid; justify-items: end; gap: 10px; }
+.remover { background: none; border: 0; color: var(--suave); cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; transition: color 0.2s; }
+.remover:hover { color: var(--erro); }
+.resumo { position: sticky; top: calc(var(--topo) + 24px); padding: 24px; border-radius: var(--raio); background: var(--cartao); border: 1px solid var(--linha); }
+.resumo .linha-resumo { display: flex; justify-content: space-between; color: var(--suave); margin-bottom: 10px; }
+.resumo .total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 16px; margin: 16px 0 22px; border-top: 1px solid var(--linha); }
+.resumo .total strong { font-family: var(--fonte-titulo); font-size: 2rem; }
+.resumo small { display: block; margin-top: 12px; color: var(--suave); font-size: 0.8rem; text-align: center; }
+
+/* ----------------------------------------------------------------- formulários (login e admin) */
+.caixa-login { min-height: 100vh; display: grid; place-items: center; padding: calc(var(--topo) + 24px) 16px 40px; }
+.cartao-login {
+  position: relative; width: min(440px, 100%); padding: 42px 36px; border-radius: 36px; isolation: isolate;
+  background:
+    radial-gradient(80% 60% at 100% 0%, rgba(47, 140, 255, 0.25), transparent 70%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+}
+.cartao-login::before {
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; z-index: -1; padding: 1px;
+  background: conic-gradient(from var(--angulo, 0deg), var(--neon), var(--roxo), var(--ciano), var(--neon));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+  animation: borda 5s linear infinite;
+}
+@property --angulo { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes borda { to { --angulo: 360deg; } }
+.campo { display: grid; gap: 8px; margin-bottom: 18px; }
+.campo label { font-size: 0.85rem; color: var(--suave); }
+.entrada { position: relative; display: flex; align-items: center; }
+.campo input, .campo textarea, .entrada input {
+  width: 100%; padding: 13px 16px; border-radius: var(--raio-p); background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--linha); outline: none; transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
+}
+.campo input:focus, .campo textarea:focus { border-color: var(--neon); background: rgba(255, 255, 255, 0.06); box-shadow: 0 0 0 4px rgba(47, 140, 255, 0.12); }
+.campo textarea { resize: vertical; min-height: 110px; }
+.entrada .olho { position: absolute; right: 10px; background: none; border: 0; color: var(--suave); cursor: pointer; display: grid; place-items: center; }
+.entrada .olho:hover { color: var(--neon); }
+
+.painel-topo { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 18px; margin-bottom: 30px; }
+.numeros { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 30px; }
+.numero { padding: 20px; border-radius: var(--raio); background: var(--cartao); border: 1px solid var(--linha); }
+.numero strong { display: block; font-family: var(--fonte-titulo); font-size: 2rem; margin-top: 4px; }
+.linhas-admin { display: grid; gap: 10px; }
+.linha-admin {
+  display: grid; grid-template-columns: 64px 1fr auto auto; gap: 18px; align-items: center; padding: 12px 16px;
+  border-radius: var(--raio-p); background: var(--cartao); border: 1px solid var(--linha); transition: border-color 0.25s, transform 0.25s;
+}
+.linha-admin:hover { border-color: var(--linha-forte); transform: translateX(4px); }
+.linha-admin img { width: 64px; height: 64px; border-radius: 10px; object-fit: cover; }
+
+.formulario-produto { display: grid; grid-template-columns: 1fr 340px; gap: 36px; align-items: start; }
+.bloco { padding: 24px; border-radius: var(--raio); background: var(--cartao); border: 1px solid var(--linha); margin-bottom: 20px; }
+.bloco h2 { font-family: var(--fonte-titulo); font-size: 1.15rem; margin: 0 0 4px; }
+.bloco > p { margin: 0 0 18px; color: var(--suave); font-size: 0.9rem; }
+.dois { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.soltar {
+  position: relative; display: grid; place-items: center; gap: 8px; min-height: 190px; padding: 20px; text-align: center;
+  border: 1.5px dashed var(--linha-forte); border-radius: var(--raio); color: var(--suave); overflow: hidden;
+  transition: border-color 0.25s, background 0.25s;
+}
+.soltar:hover, .soltar.arrastando { border-color: var(--neon); background: rgba(47, 140, 255, 0.05); color: var(--texto); }
+.soltar input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.soltar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.soltar .icone { width: 36px; height: 36px; color: var(--neon); }
+.atalhos { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.atalhos button {
+  padding: 6px 12px; border-radius: 999px; border: 1px dashed var(--linha-forte); background: none; cursor: pointer;
+  font-size: 0.82rem; color: var(--suave); transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.atalhos button:hover { border-style: solid; border-color: var(--neon); color: var(--neon); background: rgba(47, 140, 255, 0.07); }
+.linha-campo { display: grid; grid-template-columns: 1fr 1fr 42px; gap: 10px; margin-bottom: 10px; }
+.linha-campo input { padding: 11px 14px; border-radius: var(--raio-p); background: rgba(255, 255, 255, 0.04); border: 1px solid var(--linha); outline: none; }
+.linha-campo input:focus { border-color: var(--neon); }
+.linha-campo button { border-radius: var(--raio-p); border: 1px solid var(--linha); background: none; color: var(--suave); cursor: pointer; display: grid; place-items: center; }
+.linha-campo button:hover { border-color: var(--erro); color: var(--erro); }
+.previa { position: sticky; top: calc(var(--topo) + 24px); }
+.previa .rotulo { display: block; margin-bottom: 12px; }
+
+/* ----------------------------------------------------------------- janela de confirmação */
+.fundo-modal { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: 16px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px); }
+.modal { width: min(420px, 100%); padding: 28px; border-radius: 22px; background: var(--cartao); border: 1px solid var(--linha); box-shadow: var(--sombra); }
+.modal h3 { font-family: var(--fonte-titulo); margin: 0 0 8px; font-size: 1.3rem; }
+.modal p { margin: 0 0 22px; color: var(--suave); }
+.modal .acoes { display: flex; justify-content: flex-end; gap: 10px; }
+
+/* ----------------------------------------------------------------- rodapé */
+.rodape { padding: 12px 0 28px; color: var(--suave); font-size: 0.9rem; background: none !important; backdrop-filter: none !important; }
+.rodape .container {
+  display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px;
+  width: min(1240px, 100% - 44px); padding: 22px 32px; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14); background: rgba(255, 255, 255, 0.035); backdrop-filter: var(--desfoque);
+}
+
+/* ----------------------------------------------------------------- entrada suave dos elementos */
+.revelar { opacity: 0; transform: translateY(28px); }
+.sem-animacao .revelar { opacity: 1; transform: none; }
+
+/* ----------------------------------------------------------------- celular */
+@media (max-width: 900px) {
+  .produto, .carrinho, .formulario-produto { grid-template-columns: 1fr; }
+  .produto-foto, .resumo, .previa { position: static; }
+  .legenda .titulo { font-size: 2.4rem; }
+  .legenda p:not(.subtitulo) { font-size: 0.92rem; }
+  .progresso-vitrine { right: 18px; }
+}
+/* só no celular o texto vai para baixo do objeto (não há espaço ao lado) */
+@media (max-width: 700px) {
+  .palco { padding: calc(var(--topo) + 2px) 10px 10px; }
+  .moldura { border-radius: 28px; }
+  .legenda { left: 20px; right: 20px; top: auto; bottom: 80px; width: auto; display: block; padding-top: 0; }
+  .legenda .acoes-legenda .botao { font-size: 0.95rem; padding: 0.8em 1.3em; }
+  .faixa-diagonal { right: -10%; width: 45%; }
+  .indicador-rolar { display: none; }
+}
+@media (max-width: 640px) {
+  .topo .container { gap: 10px; }
+  .busca { min-width: 0; max-width: none; }
+  .busca form { min-width: 0; padding: 0 12px; }
+  .acoes-topo { gap: 6px; flex: none; }
+  .acoes-topo .icone-botao { width: 40px; height: 40px; }
+  .progresso-vitrine { top: 34%; right: 14px; }
+  .marca span:last-child { display: none; }
+  .busca form { height: 40px; }
+  .grade { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .cartao-corpo { padding: 12px; }
+  .cartao-nome { font-size: 1rem; }
+  .cartao-rodape { flex-direction: column; align-items: stretch; }
+  .item { grid-template-columns: 72px 1fr; }
+  .item img { width: 72px; height: 72px; }
+  .item-direita { grid-column: 1 / -1; grid-template-columns: 1fr auto; align-items: center; }
+  .dois { grid-template-columns: 1fr; }
+  .linha-admin { grid-template-columns: 52px 1fr auto; }
+  .linha-admin .preco { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  .revelar { opacity: 1; transform: none; }
+}
+
+/* =========================================================================================
+   Vitrines da página inicial (mais vendidos, recomendados, ofertas, novidades)
+   ========================================================================================= */
+.prateleira { padding: 20px 0; }
+.icone-rotulo { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; }
+.subtitulo-secao { margin: 10px 0 0; max-width: 56ch; }
+
+/* Divisor entre as vitrines: linha fina com uma luz que corre devagar e um ícone que flutua */
+.divisor {
+  width: min(1240px, 100% - 44px); margin: 18px auto; display: flex; align-items: center; gap: 18px;
+}
+.divisor-linha {
+  flex: 1; height: 1px; position: relative; overflow: hidden;
+  background: linear-gradient(90deg, transparent, rgba(120, 170, 255, 0.25), transparent);
+}
+.divisor-linha::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 30%;
+  background: linear-gradient(90deg, transparent, var(--neon), var(--ciano), transparent);
+  animation: luz-correndo 4.5s ease-in-out infinite;
+}
+.divisor-linha:last-child::after { animation-delay: 2.25s; }
+@keyframes luz-correndo { 0% { left: -30%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+.divisor-icone {
+  width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  color: var(--ciano); background: rgba(47, 140, 255, 0.1); border: 1px solid rgba(120, 170, 255, 0.25);
+  box-shadow: 0 0 24px rgba(47, 140, 255, 0.25);
+  animation: flutuar 4s ease-in-out infinite;
+}
+@keyframes flutuar { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+
+/* selos dos cards */
+.cartao-novo, .cartao-desconto {
+  position: absolute; right: 10px; top: 10px; padding: 4px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700;
+  backdrop-filter: blur(6px);
+}
+.cartao-novo { background: rgba(4, 14, 20, 0.82); color: #7fe8fb; border: 1px solid rgba(31, 211, 242, 0.4); }
+.cartao-desconto { background: var(--neon); color: #fff; box-shadow: 0 6px 16px rgba(47, 140, 255, 0.45); }
+
+/* preço com desconto: antigo riscado acima do novo */
+.precos { display: flex; flex-direction: column; line-height: 1.1; }
+.preco-antigo { font-size: 0.85rem; color: var(--suave); text-decoration: line-through; }
+.precos-produto { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+.precos-produto .preco { margin-bottom: 0 !important; }
+.precos-produto .preco-antigo { font-size: 1.1rem; }
+.selo-desconto { padding: 4px 12px; border-radius: 999px; background: var(--neon); color: #fff; font-weight: 700; font-size: 0.9rem; }
+
+/* vitrine sem produtos: aviso discreto em vez de um bloco grande */
+.vazio-pequeno {
+  display: flex; align-items: center; gap: 14px; padding: 22px 24px; border-radius: var(--raio);
+  background: var(--cartao); border: 1px dashed var(--linha-forte); color: var(--suave);
+}
+.vazio-pequeno .icone { width: 26px; height: 26px; color: var(--ciano); }
+
+@media (prefers-reduced-motion: reduce) {
+  .divisor-linha::after, .divisor-icone { animation: none; }
+}
+
+/* informações rápidas do produto (visualizações, pedidos, economia, atalho para a ficha) */
+.destaques a { display: inline-flex; align-items: center; gap: 8px; color: inherit; }
+.destaques li:has(a):hover { background: rgba(47, 140, 255, 0.2); border-color: rgba(47, 140, 255, 0.5); }
+.destaques li { transition: background 0.25s, border-color 0.25s; }
+.destaque-economia { background: rgba(31, 211, 242, 0.12) !important; border-color: rgba(31, 211, 242, 0.4) !important; color: #9beefc; }
+
+/* ----------------------------------------------------------------- menu de baixo (celular e tablet)
+   No celular o menu do topo some; esta barra fixa embaixo dá acesso às páginas principais. */
+.menu-celular { display: none; }
+@media (max-width: 1000px) {
+  .menu-celular {
+    position: fixed; left: 10px; right: 10px; bottom: 10px; z-index: 60; display: grid; grid-template-columns: repeat(4, 1fr);
+    padding: 6px; border-radius: 22px; background: rgba(10, 14, 24, 0.86); backdrop-filter: var(--desfoque);
+    border: 1px solid var(--linha); box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45);
+  }
+  .menu-celular a { display: grid; justify-items: center; gap: 3px; padding: 7px 0 6px; border-radius: 16px; font-size: 0.72rem; color: var(--suave); }
+  .menu-celular a svg { width: 20px; height: 20px; }
+  .menu-celular a.atual { color: #fff; background: rgba(47, 140, 255, 0.18); }
+  body { padding-bottom: 84px; }
+  .palco { padding-bottom: 88px; }   /* a vitrine termina acima da barra */
+}

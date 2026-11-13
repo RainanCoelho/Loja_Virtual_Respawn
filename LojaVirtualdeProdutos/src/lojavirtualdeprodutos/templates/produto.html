@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block titulo %}{{ p.nome }}{% endblock %}
+
+{% block conteudo %}
+{# ------------------------------------------------ 1. topo: foto + informações principais #}
+<section class="secao colada">
+  <div class="container produto">
+    {# foto e nome sem "revelar": são eles que recebem a transição vinda do card #}
+    <div class="produto-foto">
+      <img src="{{ p.imagem }}" alt="{{ p.nome }}">
+    </div>
+
+    <div class="produto-info">
+      <a class="voltar revelar" href="/catalogo"><i data-lucide="arrow-left"></i> Voltar ao catálogo</a>
+      <span class="rotulo revelar">{{ p.loja }}</span>
+      <h1 class="titulo">{{ p.nome }}</h1>
+      {% set d = p|desconto %}
+      <div class="precos-produto revelar">
+        <span class="preco">{{ p.preco|reais }}</span>
+        {% if d %}<span class="preco-antigo">{{ (p|preco_antigo)|reais }}</span><span class="selo-desconto">-{{ d }}%</span>{% endif %}
+      </div>
+      <p class="descricao revelar">{{ p.descricao }}</p>
+
+      {# informações do produto que não aparecem na ficha técnica (vêm do Redis) #}
+      <ul class="destaques revelar">
+        <li><i data-lucide="eye"></i><span>{{ visualizacoes }} visualizaç{{ "ões" if visualizacoes != 1 else "ão" }}</span></li>
+        {% if pedidos %}<li><i data-lucide="flame"></i><span>{{ pedidos }} pedido{{ "s" if pedidos != 1 }}</span></li>{% endif %}
+        {% if d %}<li class="destaque-economia"><i data-lucide="piggy-bank"></i><span>Você economiza {{ ((p|preco_antigo) - p.preco)|reais }}</span></li>{% endif %}
+        {% if p.atributos|visiveis %}<li><a href="#ficha"><i data-lucide="list"></i><span>Ver ficha técnica</span><i data-lucide="arrow-down"></i></a></li>{% endif %}
+      </ul>
+
+      <div class="acoes-produto revelar">
+        <form method="post" action="/carrinho/adicionar/{{ p._id }}">
+          <button class="botao grande" hx-post="/carrinho/adicionar/{{ p._id }}" hx-swap="none">
+            <i data-lucide="shopping-bag"></i> Adicionar ao carrinho
+          </button>
+        </form>
+        <form method="post" action="/carrinho/adicionar/{{ p._id }}">
+          <input type="hidden" name="ir" value="carrinho">
+          <button class="botao grande vazado">Comprar agora <i data-lucide="arrow-right"></i></button>
+        </form>
+      </div>
+
+      <ul class="como-comprar revelar">
+        <li><i data-lucide="shopping-bag"></i><span>Monte o carrinho</span></li>
+        <li><i data-lucide="message-circle"></i><span>Envie o pedido no WhatsApp</span></li>
+        <li><i data-lucide="truck"></i><span>Combine entrega e pagamento</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+{# ------------------------------------------------ 2. ficha técnica (campos livres do MongoDB) #}
+<section class="secao" id="ficha">
+  <div class="container">
+    <div class="cabecalho-secao revelar">
+      <div>
+        <span class="rotulo">Detalhes</span>
+        <h2 class="titulo">Ficha técnica</h2>
+      </div>
+      {% if p.atributos|visiveis %}<span class="suave">{{ (p.atributos|visiveis)|length }} característica{{ "s" if (p.atributos|visiveis)|length != 1 }}</span>{% endif %}
+    </div>
+
+    {% if p.atributos|visiveis %}
+      <dl class="ficha-tecnica">
+        {% for campo, valor in (p.atributos|visiveis).items() %}
+          <div class="ficha-linha revelar">
+            <dt>{{ campo }}</dt>
+            <dd>{{ valor }}</dd>
+          </div>
+        {% endfor %}
+      </dl>
+    {% else %}
+      <p class="suave revelar">Este produto ainda não tem características cadastradas.</p>
+    {% endif %}
+  </div>
+</section>
+
+{# ------------------------------------------------ 3. outros produtos do catálogo #}
+{% if relacionados %}
+<section class="secao">
+  <div class="container">
+    <div class="cabecalho-secao revelar">
+      <div>
+        <span class="rotulo">Continue explorando</span>
+        <h2 class="titulo">Você também pode gostar</h2>
+      </div>
+      <a class="botao vazado" href="/catalogo">Ver catálogo <i data-lucide="arrow-right"></i></a>
+    </div>
+    <div class="grade">
+      {% for p in relacionados %}{% include "_cartao.html" %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}
