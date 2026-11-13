@@ -30,6 +30,10 @@ LojaVirtualdeProdutos/
         ├── templates/    ← páginas HTML
         └── static/       ← CSS, JavaScript, modelos 3D e imagens
 ```
+## Vídeo de apresentação
+
+Baixe em [Releases](../../releases/latest).
+
 
 ## Tecnologias
 
