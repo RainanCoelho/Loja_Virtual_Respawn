@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block titulo %}{{ "Busca: " ~ termo if termo else ("Catálogo" if pagina_catalogo else "Equipamento gamer") }}{% endblock %}
+
+{% block conteudo %}
+{% if not termo and not pagina_catalogo %}
+  {# ------------------------------------------------ tela de carregamento (some quando o 3D fica pronto) #}
+  <div class="carregando" data-carregando aria-hidden="true">
+    <div class="carregando-palavra">RESPAWN</div>
+    <div class="carregando-centro">
+      <div class="carregando-linha"><span>RESPAWNING<span>_</span></span><strong data-porcentagem>0%</strong></div>
+      <div class="carregando-trilho"><span data-barra></span></div>
+      <p class="carregando-dica">Preparando o equipamento…</p>
+    </div>
+  </div>
+
+  {# ------------------------------------------------ vitrine 3D: muda de objeto conforme a rolagem #}
+  <section class="vitrine" aria-label="Vitrine">
+    <div class="palco" data-palco data-modelos='{{ modelos|default([])|tojson }}'>
+      <div class="moldura">
+        <div class="faixa-diagonal" aria-hidden="true"></div>
+        <div class="palavra-fundo" aria-hidden="true">RESPAWN</div>
+        <canvas aria-hidden="true"></canvas>
+
+        {% set legendas = [
+          ("Controles", "Controles", "Cada partida começa aqui.", "Precisão nos analógicos, gatilhos firmes e pegada confortável para sessões longas."),
+          ("Teclados", "Teclados", "Cada tecla, uma resposta.", "Mecânicos, compactos ou completos, com iluminação para jogar até tarde."),
+          ("Headsets", "Headsets", "Ouça o passo antes de ver.", "Som posicional e microfone limpo para a comunicação com o time."),
+          ("Mouses", "Mouses", "Mira no milímetro.", "Sensores precisos, peso certo e botões onde o seu dedo espera."),
+        ] %}
+        {% for rotulo, titulo, subtitulo, texto in legendas %}
+          <div class="legenda {{ 'inicial' if loop.first }}" data-legenda data-nome="{{ titulo }}">
+            <span class="rotulo">{{ "%02d"|format(loop.index) }} / 04 · Respawn</span>
+            {% if loop.first %}<h1 class="titulo">{{ titulo }}</h1>{% else %}<h2 class="titulo">{{ titulo }}</h2>{% endif %}
+            <p class="subtitulo">{{ subtitulo }}</p>
+            <p>{{ texto }}</p>
+            <div class="acoes-legenda">
+              <a class="botao grande" href="/catalogo">Comprar</a>
+              <a class="botao grande vazado" href="#mais-vendidos">Mais vendidos</a>
+            </div>
+          </div>
+        {% endfor %}
+
+        <div class="progresso-vitrine" aria-hidden="true"><i class="ativo"></i><i></i><i></i><i></i></div>
+        <div class="indicador-rolar" aria-hidden="true"><span></span>ROLE</div>
+        <div class="moldura-rodape">
+          <div class="redes">
+            <a href="#" aria-label="Instagram"><i data-lucide="instagram"></i></a>
+            <a href="#" aria-label="YouTube"><i data-lucide="youtube"></i></a>
+            <a href="/carrinho" aria-label="WhatsApp"><i data-lucide="message-circle"></i></a>
+          </div>
+          <span class="nome-objeto" data-nome-objeto>Controles</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="faixa" aria-hidden="true">
+    <div class="faixa-trilho">
+      {% for _ in range(2) %}
+        <span>CONTROLES</span><span>TECLADOS</span><span>HEADSETS</span><span>MOUSES</span><span>MOUSEPADS</span><span>VOLANTES</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ------------------------------------------------ vantagens: surgem uma a uma ao rolar #}
+  <section class="secao">
+    <div class="container">
+      <div class="cabecalho-secao">
+        <div>
+          <span class="rotulo revelar">Por que a Respawn</span>
+          <h2 class="titulo" data-letras>Feita para quem joga</h2>
+        </div>
+      </div>
+      <div class="vantagens">
+        <article class="vantagem revelar" style="--cor: var(--neon)">
+          <span class="vantagem-numero">01</span><i data-lucide="message-circle"></i>
+          <h3>Pedido no WhatsApp</h3>
+          <p>Monte o carrinho e envie o pedido pronto, sem cadastro e sem formulário.</p>
+        </article>
+        <article class="vantagem revelar" style="--cor: var(--roxo)">
+          <span class="vantagem-numero">02</span><i data-lucide="sliders-horizontal"></i>
+          <h3>Ficha técnica completa</h3>
+          <p>DPI, switch, conexão, compatibilidade: cada produto mostra o que importa para ele.</p>
+        </article>
+        <article class="vantagem revelar" style="--cor: var(--ciano)">
+          <span class="vantagem-numero">03</span><i data-lucide="search"></i>
+          <h3>Busca que lembra</h3>
+          <p>Suas pesquisas recentes ficam salvas para você voltar a elas com um clique.</p>
+        </article>
+        <article class="vantagem revelar" style="--cor: var(--erro)">
+          <span class="vantagem-numero">04</span><i data-lucide="gamepad-2"></i>
+          <h3>Do controle ao volante</h3>
+          <p>Periféricos para PC e console, do jogo casual ao competitivo.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  {# ------------------------------------------------ vitrines: mais vendidos, recomendados, ofertas, novidades #}
+  {% for s in prateleiras %}
+    {% if not loop.first %}
+      {# divisor com animação discreta: uma luz corre pela linha e o ícone flutua devagar #}
+      <div class="divisor" aria-hidden="true">
+        <span class="divisor-linha"></span>
+        <span class="divisor-icone"><i data-lucide="{{ s.icone }}"></i></span>
+        <span class="divisor-linha"></span>
+      </div>
+    {% endif %}
+    <section class="secao prateleira" id="{{ s.id }}">
+      <div class="container">
+        <div class="cabecalho-secao">
+          <div>
+            <span class="rotulo revelar"><i data-lucide="{{ s.icone }}" class="icone-rotulo"></i> {{ s.rotulo }}</span>
+            <h2 class="titulo" data-letras>{{ s.titulo }}</h2>
+            <p class="suave revelar subtitulo-secao">{{ s.subtitulo }}</p>
+          </div>
+          <a class="botao vazado revelar" href="/catalogo">Ver catálogo <i data-lucide="arrow-right"></i></a>
+        </div>
+        {% if s.produtos %}
+          <div class="grade">
+            {% with selo = s.selo %}
+              {% for p in s.produtos %}{% include "_cartao.html" %}{% endfor %}
+            {% endwith %}
+          </div>
+        {% else %}
+          <div class="vazio-pequeno revelar"><i data-lucide="{{ s.icone }}"></i><span>{{ s.vazio }}</span></div>
+        {% endif %}
+      </div>
+    </section>
+  {% endfor %}
+
+{% endif %}
+
+{% if termo or pagina_catalogo %}
+<section class="secao colada" id="catalogo">
+  <div class="container">
+    <div class="cabecalho-secao">
+      <div class="revelar">
+        {% if termo %}
+          <span class="rotulo">Resultado da busca</span>
+          <h1 class="titulo">“{{ termo }}”</h1>
+          <p class="suave">{{ produtos|length }} produto{{ "s" if produtos|length != 1 }} encontrado{{ "s" if produtos|length != 1 }}</p>
+        {% else %}
+          <a class="voltar" href="/"><i data-lucide="arrow-left"></i> Voltar ao início</a>
+          <span class="rotulo">Catálogo completo</span>
+          <h1 class="titulo">Todos os produtos</h1>
+          <p class="suave">{{ produtos|length }} produto{{ "s" if produtos|length != 1 }} na loja</p>
+        {% endif %}
+      </div>
+      {% if produtos|length > 1 %}
+        <label class="ordenar revelar">
+          <i data-lucide="arrow-up-down"></i> Ordenar
+          <select data-ordenar>
+            <option value="padrao">Mais recentes</option>
+            <option value="menor">Menor preço</option>
+            <option value="maior">Maior preço</option>
+            <option value="nome">Nome (A–Z)</option>
+          </select>
+        </label>
+      {% endif %}
+    </div>
+
+    {% if produtos %}
+      <div class="grade" data-grade>
+        {% for p in produtos %}{% include "_cartao.html" %}{% endfor %}
+      </div>
+    {% else %}
+      <div class="vazio-grande revelar">
+        <i data-lucide="{{ 'search-x' if termo else 'package-open' }}"></i>
+        {% if termo %}
+          <h3 class="titulo">Nada encontrado para “{{ termo }}”</h3>
+          <p class="suave">Tente outro nome, como “mouse” ou “teclado”.</p>
+          <a class="botao vazado" href="/">Ver todos os produtos</a>
+        {% else %}
+          <h3 class="titulo">O catálogo ainda está vazio</h3>
+          <p class="suave">Os produtos aparecem aqui assim que forem cadastrados no painel.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if not termo and not pagina_catalogo %}
+  <script type="importmap">
+    { "imports": { "three": "/static/vendor/three/three.module.js", "three/addons/": "/static/vendor/three/addons/" } }
+  </script>
+  <script type="module" src="/static/js/cena3d.js"></script>
+{% endif %}
+{% endblock %}

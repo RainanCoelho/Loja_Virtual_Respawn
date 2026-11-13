@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block titulo %}Painel{% endblock %}
+
+{% block conteudo %}
+<section class="secao colada" x-data="{ apagar: null, nome: '' }">
+  <div class="container">
+    <div class="painel-topo revelar">
+      <div>
+        <span class="rotulo">Painel do administrador</span>
+        <h1 class="titulo" style="font-size:clamp(2rem,4vw,3rem);margin-top:8px">Produtos</h1>
+        <p class="suave" style="margin:6px 0 0">Conectado como {{ admin }}</p>
+      </div>
+      <a class="botao grande" href="/admin/produto" data-magnetico><i data-lucide="plus"></i> Novo produto</a>
+    </div>
+
+    {% set campos_total = namespace(n=0) %}
+    {% for p in produtos %}{% set campos_total.n = campos_total.n + (p.atributos|length if p.atributos else 0) %}{% endfor %}
+    <div class="numeros">
+      <div class="numero revelar"><span class="suave">Produtos no MongoDB</span><strong>{{ produtos|length }}</strong></div>
+      <div class="numero revelar"><span class="suave">Preço médio</span>
+        <strong>{{ ((produtos|sum(attribute="preco")) / produtos|length)|reais if produtos else "R$ 0,00" }}</strong></div>
+      <div class="numero revelar"><span class="suave">Campos personalizados</span><strong>{{ campos_total.n }}</strong></div>
+    </div>
+
+    {% if produtos %}
+      <div class="linhas-admin">
+        {% for p in produtos %}
+          <div class="linha-admin revelar">
+            <img src="{{ p.imagem }}" alt="">
+            <div>
+              <a href="/produto/{{ p._id }}" style="font-weight:600">{{ p.nome }}</a>
+              <div class="suave" style="font-size:.85rem">
+                {% if p.atributos %}{{ p.atributos.keys()|join(" · ") }}{% else %}sem campos extras{% endif %}
+              </div>
+            </div>
+            <span class="preco" style="font-size:1.1rem">{{ p.preco|reais }}</span>
+            <button class="botao redondo perigo" type="button" aria-label="Apagar {{ p.nome }}"
+                    @click="apagar = '/admin/apagar/{{ p._id }}'; nome = {{ p.nome|tojson|forceescape }}">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="vazio-grande revelar">
+        <i data-lucide="package-plus"></i>
+        <h2 class="titulo">Nenhum produto cadastrado</h2>
+        <p class="suave">Cadastre o primeiro e ele aparece no catálogo na hora.</p>
+        <a class="botao" href="/admin/produto"><i data-lucide="plus"></i> Cadastrar produto</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="fundo-modal" x-show="apagar" x-cloak x-transition.opacity @keydown.escape.window="apagar = null" @click.self="apagar = null">
+    <div class="modal" x-show="apagar" x-transition.scale.90>
+      <h3>Apagar produto?</h3>
+      <p><strong x-text="nome"></strong> sai do catálogo e do MongoDB. Isso não pode ser desfeito.</p>
+      <form method="post" :action="apagar" class="acoes">
+        <button type="button" class="botao vazado" @click="apagar = null">Cancelar</button>
+        <button class="botao perigo"><i data-lucide="trash-2"></i> Apagar</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}

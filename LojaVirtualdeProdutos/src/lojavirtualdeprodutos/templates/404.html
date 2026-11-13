@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block titulo %}Página não encontrada{% endblock %}
+
+{% block conteudo %}
+<section class="caixa-login">
+  <div class="vazio-grande revelar" style="width:min(560px,100%)">
+    <i data-lucide="ghost"></i>
+    <span class="rotulo">Erro 404</span>
+    <h1 class="titulo" style="font-size:2.4rem">Game over para esta página</h1>
+    <p class="suave">O endereço não existe ou o produto foi removido. Que tal dar respawn no catálogo?</p>
+    <a class="botao grande" href="/" data-magnetico><i data-lucide="rotate-ccw"></i> Voltar ao início</a>
+  </div>
+</section>
+{% endblock %}

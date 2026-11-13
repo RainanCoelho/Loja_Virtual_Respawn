@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Carrinho{% endblock %}
+
+{% block conteudo %}
+<section class="secao colada">
+  <div class="container">
+    <div class="cabecalho-secao revelar">
+      <div>
+        <span class="rotulo">Seu pedido</span>
+        <h1 class="titulo">Carrinho</h1>
+      </div>
+    </div>
+    {% include "_carrinho.html" %}
+  </div>
+</section>
+{% endblock %}

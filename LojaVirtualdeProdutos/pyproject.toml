@@ -1,0 +1,23 @@
+[project]
+name = "lojavirtualdeprodutos"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "RainanCoelho", email = "raiaraujocoelho@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "flask>=3.1.3",
+    "pymongo>=4.20.0",
+    "python-dotenv>=1.2.4",
+    "redis>=8.1.0",
+    "supabase>=2.34.1",
+    "werkzeug>=3.1.9",
+]
+
+[project.scripts]
+lojavirtualdeprodutos = "lojavirtualdeprodutos:main"
+
+[build-system]
+requires = ["uv_build>=0.12.24,<0.13.0"]
+build-backend = "uv_build"

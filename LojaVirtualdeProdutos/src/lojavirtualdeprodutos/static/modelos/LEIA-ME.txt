@@ -1,0 +1,20 @@
+Modelos 3D do carrossel da página inicial, em formato .glb, com estes nomes:
+
+  controle.glb   -> 1º objeto (legenda "Controles")
+  teclado.glb    -> 2º objeto (legenda "Teclados")
+  fone.glb       -> 3º objeto (legenda "Headsets")
+  mouse.glb      -> 4º objeto (legenda "Mouses")
+
+- Os quatro ficam lado a lado num círculo; ao rolar a página o círculo gira e traz o próximo
+  para a frente, junto com a mensagem dele.
+- Para trocar um modelo, basta substituir o arquivo com o mesmo nome. O que faltar volta a
+  usar o modelo feito em código.
+- O tamanho e a posição são ajustados sozinhos. Se um modelo ficar grande ou pequeno demais,
+  ajuste a linha "o.escala = { teclado: 1.15, fone: 0.78, mouse: 0.95 }" no static/js/cena3d.js.
+- Tente manter cada arquivo abaixo de ~3 MB.
+
+Origem dos arquivos atuais (convertidos a partir dos downloads em 12/11/2026):
+  controle.glb <- blend.zip (PS5 DualSense Controller.blend), cores aplicadas pelo site
+  teclado.glb  <- gaming_keyboard.glb, texturas reduzidas para 2048 px
+  fone.glb     <- fbx.rar (Kraken Headphones.fbx), malha simplificada para ~7%
+  mouse.glb    <- chiron+pro.rar (chiron.blend, só um dos dois mouses), escurecido pelo site

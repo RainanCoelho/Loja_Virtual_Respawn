@@ -1,0 +1,52 @@
+{# Parte da tela do carrinho que o htmx troca quando a quantidade muda, sem recarregar a página. #}
+<div id="carrinho-area">
+  {% if itens %}
+    <div class="carrinho">
+      <div class="itens">
+        {% for i in itens %}
+          {% set p = i.produto %}
+          <article class="item">
+            <a href="/produto/{{ p._id }}"><img src="{{ p.imagem }}" alt="{{ p.nome }}"></a>
+            <div>
+              <a class="item-nome" href="/produto/{{ p._id }}">{{ p.nome }}</a>
+              <div class="suave">{{ p.preco|reais }} cada</div>
+              <div class="quantidade">
+                <button hx-post="/carrinho/menos/{{ p._id }}" hx-target="#carrinho-area" hx-swap="outerHTML" aria-label="Diminuir"><i data-lucide="minus"></i></button>
+                <span>{{ i.quantidade }}</span>
+                <button hx-post="/carrinho/mais/{{ p._id }}" hx-target="#carrinho-area" hx-swap="outerHTML" aria-label="Aumentar"><i data-lucide="plus"></i></button>
+              </div>
+            </div>
+            <div class="item-direita">
+              <strong class="preco">{{ i.subtotal|reais }}</strong>
+              <button class="remover" hx-post="/carrinho/remover/{{ p._id }}" hx-target="#carrinho-area" hx-swap="outerHTML">
+                <i data-lucide="trash-2"></i> Remover
+              </button>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      <aside class="resumo">
+        <div class="linha-resumo"><span>Itens</span><span>{{ itens|sum(attribute="quantidade") }}</span></div>
+        <div class="linha-resumo"><span>Entrega</span><span>Combinada no WhatsApp</span></div>
+        <div class="total">
+          <span>Total</span>
+          <strong data-valor="{{ total }}" data-chave="total">{{ total|reais }}</strong>
+        </div>
+        <form method="post" action="/comprar">
+          <button class="botao whats grande cheio" data-magnetico>
+            <i data-lucide="message-circle"></i> Comprar pelo WhatsApp
+          </button>
+        </form>
+        <small>Você será levado ao WhatsApp com o pedido já escrito.</small>
+      </aside>
+    </div>
+  {% else %}
+    <div class="vazio-grande">
+      <i data-lucide="shopping-bag"></i>
+      <h2 class="titulo">Seu carrinho está vazio</h2>
+      <p class="suave">Escolha um equipamento no catálogo e ele aparece aqui.</p>
+      <a class="botao" href="/catalogo" data-magnetico>Ver produtos <i data-lucide="arrow-right"></i></a>
+    </div>
+  {% endif %}
+</div>

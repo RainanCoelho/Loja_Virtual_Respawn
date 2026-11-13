@@ -1,0 +1,7 @@
+<ul class="lista-buscas" id="lista-buscas">
+  {% for termo_antigo in buscas_recentes %}
+    <li><a href="/buscar?q={{ termo_antigo|urlencode }}"><i data-lucide="search" style="width:13px;height:13px"></i>{{ termo_antigo }}</a></li>
+  {% else %}
+    <li class="vazio">Nenhuma pesquisa ainda.</li>
+  {% endfor %}
+</ul>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Respawn{% endblock %} · Respawn</title>
+  <meta name="description" content="Respawn: controles, teclados, mouses, headsets e acessórios para jogos.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232f8cff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/vendor/lenis/lenis.css">
+  <link rel="stylesheet" href="/static/css/respawn.css">
+
+  <script src="/static/vendor/gsap/gsap.min.js" defer></script>
+  <script src="/static/vendor/gsap/ScrollTrigger.min.js" defer></script>
+  <script src="/static/vendor/gsap/Flip.min.js" defer></script>
+  <script src="/static/vendor/lenis/lenis.min.js" defer></script>
+  <script src="/static/vendor/htmx/htmx.min.js" defer></script>
+  <script src="/static/vendor/lucide/lucide.min.js" defer></script>
+  <script src="/static/js/respawn.js" defer></script>
+  <script src="/static/vendor/alpine/alpine.min.js" defer></script>
+  {% block cabeca %}{% endblock %}
+</head>
+<body>
+  <div class="cursor-anel" aria-hidden="true"></div>
+  <div class="cursor-ponto" aria-hidden="true"></div>
+
+  <header class="topo">
+    <div class="container">
+      <a class="marca" href="/" aria-label="Respawn, página inicial">
+        <span class="marca-icone"><i data-lucide="rotate-ccw"></i></span>
+        <span>RESPAWN</span>
+      </a>
+
+      {% set inicio = "" if request.path == "/" else "/" %}
+      <nav class="menu" aria-label="Menu">
+        <a href="/catalogo">Catálogo</a>
+        <a href="{{ inicio }}#mais-vendidos">Mais vendidos</a>
+        <a href="{{ inicio }}#ofertas">Ofertas</a>
+        <a href="{{ inicio }}#novidades">Novidades</a>
+        <a href="/carrinho">Carrinho</a>
+      </nav>
+
+      <div class="busca" x-data="{ aberto: false }" @click.outside="aberto = false" @keydown.escape="aberto = false">
+        <form action="/buscar" method="get" role="search">
+          <i data-lucide="search"></i>
+          <input type="search" name="q" placeholder="Buscar controle, teclado, headset..." autocomplete="off"
+                 value="{{ termo or '' }}" @focus="aberto = true" aria-label="Buscar produtos">
+        </form>
+        <div class="busca-pop" x-show="aberto" x-cloak x-transition.origin.top.duration.200ms>
+          <header>
+            <span><i data-lucide="history" style="width:14px;height:14px;vertical-align:-2px"></i> Pesquisas recentes</span>
+            <button type="button" hx-post="/buscas/limpar" hx-target="#lista-buscas" hx-swap="outerHTML">Limpar</button>
+          </header>
+          {% include "_buscas.html" %}
+        </div>
+      </div>
+
+      <nav class="acoes-topo">
+        <a class="icone-botao" href="/carrinho" data-carrinho aria-label="Carrinho">
+          <i data-lucide="shopping-bag"></i>
+          <span class="contador" data-contador data-qtd="{{ qtd_carrinho }}">{{ qtd_carrinho }}</span>
+        </a>
+        {% if admin %}
+          <a class="icone-botao" href="/admin" aria-label="Painel do administrador"><i data-lucide="layout-dashboard"></i></a>
+          <a class="icone-botao" href="/sair" aria-label="Sair"><i data-lucide="log-out"></i></a>
+        {% else %}
+          <a class="icone-botao" href="/login" aria-label="Entrar como administrador"><i data-lucide="user-round"></i></a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <nav class="menu-celular" aria-label="Menu">
+    <a href="/" class="{{ 'atual' if request.path == '/' }}"><i data-lucide="house"></i>Início</a>
+    <a href="/catalogo" class="{{ 'atual' if request.path.startswith('/catalogo') }}"><i data-lucide="layout-grid"></i>Catálogo</a>
+    <a href="{{ inicio }}#ofertas"><i data-lucide="badge-percent"></i>Ofertas</a>
+    <a href="/carrinho" class="{{ 'atual' if request.path.startswith('/carrinho') }}"><i data-lucide="shopping-bag"></i>Carrinho</a>
+  </nav>
+
+  <main>
+    {% block conteudo %}{% endblock %}
+  </main>
+
+  <footer class="rodape">
+    <div class="container">
+      <span><strong>RESPAWN</strong> · equipamento para quem nunca para de jogar</span>
+      <span>Pedidos finalizados pelo WhatsApp</span>
+    </div>
+  </footer>
+
+  <div class="avisos" aria-live="polite"></div>
+  <script id="mensagens" type="application/json">{{ get_flashed_messages()|tojson }}</script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>
