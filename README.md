@@ -11,7 +11,7 @@ Projeto da disciplina de **Projeto de Banco de Dados**. A **Respawn** é uma loj
 🔗 **Site no ar:** https://respawn-rouge.vercel.app
 🎬 **Vídeo de apresentação:** disponível em [Releases](../../releases/latest)
 
-![Página inicial](docs/telas/inicio.jpg)
+![Página inicial](Respawn%20README/docs/telas/inicio.jpg)
 
 ## Funcionalidades
 
@@ -163,11 +163,11 @@ Dois cuidados:
 
 | Vitrines | Página do produto |
 |---|---|
-| ![Mais vendidos](docs/telas/vitrines.jpg) | ![Produto](docs/telas/produto.jpg) |
+| ![Mais vendidos](Respawn%20README/docs/telas/vitrines.jpg) | ![Produto](Respawn%20README/docs/telas/produto.jpg) |
 
 | Catálogo | Celular |
 |---|---|
-| ![Catálogo](docs/telas/catalogo.jpg) | <img src="docs/telas/celular.jpg" alt="Versão para celular" width="260"> |
+| ![Catálogo](Respawn%20README/docs/telas/catalogo.jpg) | <img src="Respawn%20README/docs/telas/celular.jpg" alt="Versão para celular" width="260"> |
 
 As fotos dos produtos de exemplo são do Unsplash (licença gratuita). Os modelos 3D do carrossel ficam em `static/modelos`.
 
